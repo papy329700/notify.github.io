@@ -1,37 +1,69 @@
-## Welcome to GitHub Pages
+## Notifications
 
-You can use the [editor on GitHub](https://github.com/papy329700/notify.github.io/edit/master/index.md) to maintain and preview the content for your website in Markdown files.
+Inside Dwains Theme, you can display notifications at the top of your home screen. You can create or dismiss notifications with automations.
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+### Example
 
-### Markdown
+The example below creates a notification when the garbage gets collected tomorrow, edits the notification to today on the next day, and dismisses the notification at the end of the second day.
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+## Create a notification
 
 ```markdown
-Syntax highlighted code block
+- id: notify_create_garbage_tomorrow_dwains_theme
+  alias: Notify create garbage tomorrow Dwains theme
+  description: 'This automation creates a notification in Dwains theme'
+  trigger:
+  - at: '00:01'
+    platform: time
+  condition:
+  - condition: state
+    entity_id: sensor.garbage_tomorrow
+    state: On
+  action:
+  - data:
+      message: You have to put the bins out tomorrow.
+      notification_id: garbage
+    service: dwains_theme.notification_create
+    
+```
+## Edit a notification 
 
-# Header 1
-## Header 2
-### Header 3
-
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
+```markdown
+- id: notify_create_garbage_today_dwains_theme
+  alias: Notify create garbage today Dwains theme
+  description: 'This automation edits the previous notification in Dwains theme'
+  trigger:
+  - at: '00:01'
+    platform: time
+  condition:
+  - condition: state
+    entity_id: sensor.garbage_today
+    state: On
+  action:
+  - data:
+      message: You have to put the bins out today.
+      notification_id: garbage
+    service: dwains_theme.notification_create
+    
 ```
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
+## Dismiss the notification
 
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/papy329700/notify.github.io/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+```markdown
+- id: notify_dismiss_garbage_dwains_theme
+  alias: Notify dismiss garbage Dwains theme
+  description: 'This automation dismisses the garbage notification in Dwains theme'
+  trigger:
+  - at: '23:59'
+    platform: time
+  condition:
+  - condition: state
+    entity_id: sensor.garbage_today
+    state: On
+  action:
+  - data:
+      notification_id: garbage
+    service: dwains_theme.notification_dismiss
+    
+```
+Notification_id is needed to let it work. Only 1 notification for each notification_id can be displayed at the same time. To get multiple notifications, some would need multiple notification_id's.
